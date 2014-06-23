@@ -117,11 +117,15 @@
         private static ApplicationContext CreateApplicationContext()
         {
             Type applicationContextType = typeof(ApplicationContext);
-            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            ConstructorInfo constructor = applicationContextType.GetConstructor(bindingFlags, null, CallingConventions.Any, Type.EmptyTypes, null);
-            PropertyInfo propertyInfo = applicationContextType.GetProperty("IsReady", bindingFlags);
-            ApplicationContext context = (ApplicationContext)constructor.Invoke(null);
+            Type cacheHelperType = typeof(CacheHelper);
 
+            BindingFlags bindingFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+            ConstructorInfo constructor = applicationContextType.GetConstructor(bindingFlags, null, CallingConventions.Any, new[] { cacheHelperType  }, null);
+            
+            var cacheHelper = new CacheHelper();
+            ApplicationContext context = (ApplicationContext)constructor.Invoke(new []{ cacheHelper } );
+
+            PropertyInfo propertyInfo = applicationContextType.GetProperty("IsReady", bindingFlags);
             propertyInfo.SetValue(context, true, null);
 
             return context;
